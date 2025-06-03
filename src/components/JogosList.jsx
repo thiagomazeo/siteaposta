@@ -1,42 +1,35 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import JogosList from './JogosList.jsx';
 
-const th = {
-  border: "1px solid #ccc",
-  padding: "8px",
-  background: "#f2f2f2",
-  textAlign: "left",
-};
+function App() {
+  const [jogos, setJogos] = useState([]);
+  const [carregando, setCarregando] = useState(true);
 
-const td = {
-  border: "1px solid #ccc",
-  padding: "8px",
-};
+  useEffect(() => {
+    fetch("/jogos.json")
+      .then(res => res.json())
+      .then(data => {
+        setJogos(data);
+        setCarregando(false);
+      })
+      .catch(err => {
+        console.error("Erro ao carregar jogos:", err);
+        setCarregando(false);
+      });
+  }, []);
 
-export default function JogosList({ jogos }) {
   return (
-    <table style={{ borderCollapse: "collapse", width: "100%" }}>
-      <thead>
-        <tr>
-          <th style={th}>Hora</th>
-          <th style={th}>Time Casa</th>
-          <th style={th}>Time Fora</th>
-          <th style={th}>1</th>
-          <th style={th}>X</th>
-          <th style={th}>2</th>
-        </tr>
-      </thead>
-      <tbody>
-        {jogos.map((jogo, index) => (
-          <tr key={index}>
-            <td style={td}>{jogo.hora}</td>
-            <td style={td}>{jogo.timeCasa}</td>
-            <td style={td}>{jogo.timeFora}</td>
-            <td style={td}>{jogo.odd1}</td>
-            <td style={td}>{jogo.oddX}</td>
-            <td style={td}>{jogo.odd2}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <div style={{ padding: "20px", fontFamily: "Arial" }}>
+      <h1 style={{ marginBottom: "20px" }}>🟢 Jogos de Hoje – Faz o Simples</h1>
+      {carregando ? (
+        <p>Carregando jogos...</p>
+      ) : jogos.length === 0 ? (
+        <p>Nenhum jogo encontrado.</p>
+      ) : (
+        <JogosList jogos={jogos} />
+      )}
+    </div>
   );
 }
+
+export default App;
